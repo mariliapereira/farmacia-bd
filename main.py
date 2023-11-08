@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import mysql.connector
 
-#rodar com:  streamlit run "C:\Users\heyda\OneDrive\Documentos\GitHub\farmacia-bd/teste.py"
+#rodar com:  streamlit run "c:/Users/heyda/OneDrive/Documentos/GitHub/farmacia-bd/main.py"
 
 #conexão com o banco
 conn = mysql.connector.connect(
@@ -36,16 +36,23 @@ def update_data(table, set_column, set_value, condition_column, condition_value)
     st.success(f'Dados atualizados em {table}.')
 
 #select
-def select_data(table):
-    query = f"SELECT * FROM {table}"
+#def select_data(table, data):
+    #query = f"SELECT * FROM {table}"           
+    #cursor.execute(query)
+    #data = cursor.fetchall()
+    #return data
+
+def select_data(data):
+    query = f"SELECT total_creditos({data});"
     cursor.execute(query)
-    data = cursor.fetchall()
-    return data
+    query_result = cursor.fetchone()
+    valor = query_result[0]
+    return valor
 
 #interface
 st.title("Aplicação de Gerenciamento de Dados")
 operation = st.sidebar.selectbox("Selecione a operação", ("Inserir", "Deletar", "Atualizar", "Select"))
-table = st.sidebar.selectbox("Selecione a tabela", ("curso", "projeto", "pessoa", "professor", "disciplina", "turma", "ministra", "aluno", "aluno_turma", "prova", "monitoria"))
+table = st.sidebar.selectbox("Selecione a tabela", ("curso", "projeto", "pessoa", "professor", "disciplina", "turma", "ministra", "aluno", "aluno_turma", "prova", "monitoria", "busca - créditos totais"))
 
 if operation == "Inserir":
     if table == "curso":
@@ -67,14 +74,19 @@ elif operation == "Atualizar":
 elif operation == 'Select':
     if table == "curso":
         data = select_data(table)
-        st.write("Dados da tabela 'curso':")
+        st.write("Dados da tabela Curso:")
         df = pd.DataFrame(data, columns=["Código do Curso", "Nome do Curso"])
         st.dataframe(df.set_index('Código do Curso'), width=800)
     if table == 'aluno':
         data = select_data(table)
-        st.write("Dados da tabela 'aluno':")
+        st.write("Dados da tabela Aluno:")
         df = pd.DataFrame(data, columns=["Matrícula do aluno", "Nota do vestibular", "Codigo do curso"])
         st.dataframe(df.set_index('Matrícula do aluno'), width=800)
+    if table == 'busca - créditos totais':
+        matricula_aluno = st.number_input("Matrícula do aluno", min_value=0)
+        if st.button("Buscar"):
+            result = select_data(matricula_aluno)
+            st.write(f"Total de créditos do aluno: {result}")
 
 cursor.close()
 conn.close()
