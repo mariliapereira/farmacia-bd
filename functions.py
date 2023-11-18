@@ -7,7 +7,7 @@ import mysql.connector
 # conexão com o banco
 def open_conn(input_user, input_password):
     conn2 = mysql.connector.connect(
-        host="localhost", user="root", password="pacienc1@", database="UNIVERSIDADE"
+        host="localhost", user="root", password="pacienc1@", database="Farmacia_NovoDia"
     )
     cursor2 = conn2.cursor()
     cursor2.execute(f"SELECT COUNT(*) FROM mysql.user WHERE user = '{input_user}'")
@@ -23,7 +23,7 @@ def open_conn(input_user, input_password):
         host="localhost",
         user=input_user,
         password=input_password,
-        database="UNIVERSIDADE",
+        database="Farmacia_NovoDia",
     )
 
     cursor = conn.cursor()
@@ -54,20 +54,52 @@ def update_data(conn, cursor, table, set_column, set_value, condition_column, co
 
 
 # select
-# def select_data(conn, cursor, table, data):
-# query = f"SELECT * FROM {table}"
-# cursor.execute(query)
-# data = cursor.fetchall()
-# return data
-
-
-def select_data(conn, cursor, data):
-    query = f"SELECT total_creditos({data});"
+def select_table(conn, cursor, table, data):
+    query = f"SELECT * FROM {table}"
     cursor.execute(query)
-    query_result = cursor.fetchone()
-    valor = query_result[0]
-    return valor
+    data = cursor.fetchall()
+    return data
 
+
+#def select_data(conn, cursor, data):
+#    query = f"SELECT total_creditos({data});"
+#    cursor.execute(query)
+#    query_result = cursor.fetchone()
+#    valor = query_result[0]
+#    return valor
+
+def select_venda_data(conn, cursor, data):
+    query = f"SELECT * FROM venda WHERE data_venda = '{data}';"
+    cursor.execute(query)
+    data = cursor.fetchall()
+    return data
+
+def select_preco_venda(conn, cursor, data):
+    query = f"SELECT valor FROM venda WHERE cod_venda = '{data}';"
+    cursor.execute(query)
+    data = cursor.fetchall()
+    return data
+
+def select_balc_turno(conn, cursor, data):
+    query = f"SELECT b.cpf_balconista, f.nome FROM balconista b JOIN funcionario f ON b.cpf_balconista = f.cpf_func WHERE b.turno = '{data}';"
+    cursor.execute(query)
+    data = cursor.fetchall()
+    return data
+
+def select_func_venda(conn, cursor, data):
+    query = f"SELECT v.cpf_func, f.nome FROM venda v JOIN funcionario f ON v.cpf_func = f.cpf_func WHERE cod_venda = '{data}';"
+    cursor.execute(query)
+    data = cursor.fetchall()
+    return data
+
+# fazer uns select mais complicados! usar join!!! algum procedure ou função?
+# função tipo qual o valor total que um cliente x já gastou? pegar todas as ocorrências do mesmo cliente em venda por exemplo e sair somando o valor?
+# usar coisa tipo max min avg not null like etc
+
+def get_table_columns(cursor, table):
+    cursor.execute(f"PRAGMA table_info({table})")  # Para SQLite, substitua pela consulta específica do seu banco de dados
+    columns = [column[1] for column in cursor.fetchall()]
+    return columns
 
 # fechar conexão
 def close_conn(conn, cursor):
