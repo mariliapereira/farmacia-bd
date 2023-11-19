@@ -7,7 +7,7 @@ import mysql.connector
 # conexão com o banco
 def open_conn(input_user, input_password):
     conn2 = mysql.connector.connect(
-        host="localhost", user="root", password="pacienc1@", database="Farmacia_NovoDia"
+        host="localhost", user="root", password="pacienc1@", database="farmacia"
     )
     cursor2 = conn2.cursor()
     cursor2.execute(f"SELECT COUNT(*) FROM mysql.user WHERE user = '{input_user}'")
@@ -23,7 +23,7 @@ def open_conn(input_user, input_password):
         host="localhost",
         user=input_user,
         password=input_password,
-        database="Farmacia_NovoDia",
+        database="farmacia",
     )
 
     cursor = conn.cursor()
@@ -31,11 +31,16 @@ def open_conn(input_user, input_password):
 
 # insert
 def insert_data(conn, cursor, table, data):
-    query = f"INSERT INTO {table} VALUES ({', '.join(['%s']*len(data))})"
+    print(f'data --> {data}')
+    if table == "Venda":
+        query = f"INSERT INTO {table} (fk_cliente, fk_func, data_venda) VALUES ({', '.join(['%s']*len(data))}) "
+    elif table == "Produto":
+        query = f"INSERT INTO {table} (preco, nome, tipo, descricao, marca) VALUES ({', '.join(['%s']*len(data))}) "
+    else:
+        query = f"INSERT INTO {table} VALUES ({', '.join(['%s']*len(data))})"
     cursor.execute(query, data)
     conn.commit()
     st.success(f"Dados inseridos em {table}.")
-
 
 # delete
 def delete_data(conn, cursor, table, condition_column, condition_value):
@@ -54,7 +59,7 @@ def update_data(conn, cursor, table, set_column, set_value, condition_column, co
 
 
 # select
-def select_table(conn, cursor, table, data):
+def select_table(conn, cursor, table):
     query = f"SELECT * FROM {table}"
     cursor.execute(query)
     data = cursor.fetchall()
@@ -92,14 +97,21 @@ def select_func_venda(conn, cursor, data):
     data = cursor.fetchall()
     return data
 
+def select_prod_marca(conn, cursor, data):
+    query = f"SELECT * FROM produto WHERE p.marca = '{data}';"
+    cursor.execute(query)
+    data = cursor.fetchall()
+    return data
+
 # fazer uns select mais complicados! usar join!!! algum procedure ou função?
 # função tipo qual o valor total que um cliente x já gastou? pegar todas as ocorrências do mesmo cliente em venda por exemplo e sair somando o valor?
 # usar coisa tipo max min avg not null like etc
 
-def get_table_columns(cursor, table):
-    cursor.execute(f"PRAGMA table_info({table})")  # Para SQLite, substitua pela consulta específica do seu banco de dados
-    columns = [column[1] for column in cursor.fetchall()]
-    return columns
+def get_cod_nota(conn, cursor, cliente_venda, funcionario_venda, data_venda):
+    query = f"SELECT cod_nota_fiscal FROM venda WHERE fk_cliente = '{cliente_venda}' AND fk_func = '{funcionario_venda}' AND data_venda = '{data_venda}';"
+    cursor.execute(query)
+    data = cursor.fetchall()
+    return data[-1][0]
 
 # fechar conexão
 def close_conn(conn, cursor):
