@@ -5,7 +5,6 @@ from functions import *
 # rodar com:  
 # streamlit run "c:/Users/heyda/OneDrive/Documentos/GitHub/farmacia-bd/main.py"
 
-
 if __name__ == '__main__':
     if 'username' not in st.session_state:
         st.session_state.username = None
