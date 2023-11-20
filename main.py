@@ -26,8 +26,12 @@ if __name__ == '__main__':
     else:
         st.title("Farmácia Novo Dia - Banco de Dados")
         operation = st.sidebar.selectbox("Selecione a operação", ("Inserir", "Deletar", "Atualizar", "Visualizar", "Gerar relatório"))
-        table = st.sidebar.selectbox("Escolha uma tabela:", ["Cliente", "Venda", "Produto", "Funcionário"])
-            
+        if operation == "Gerar relatório":
+            table_options = ("Funcionário do mês", "Arrecadamento mensal", "Produto mais vendido por mês", "Produto favorito por cliente")
+        else:
+            table_options = ("Cliente", "Venda", "Produto", "Funcionário")
+        table = st.sidebar.selectbox("Escolha uma tabela:", table_options)
+
         conn, cursor = open_conn(st.session_state['username'], st.session_state['password'])
 
         if operation == "Inserir":
@@ -397,4 +401,35 @@ if __name__ == '__main__':
                 st.write(f"{table}s:")
                 df = pd.DataFrame(result, columns=["Cpf", "Cpf do gerente", "Salário", "Data de nascimento", "Telefone 1", "Telefone 2", "Rua", "Número", "Bairro", "Nome"])
                 st.dataframe(df.set_index('Cpf'), width=800)
-               
+        
+        elif operation == "Gerar relatório":
+            meses = {1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril", 5: "Maio", 6: "Junho", 
+                                7: "Julho", 8: "Agosto", 9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro"}
+            if table == "Funcionário do mês":
+                mes = st.number_input("Mês", min_value=1, max_value=12)
+                result = funcionario_do_mes(conn, cursor, mes)
+                nome_mes = meses.get(mes)
+                st.write(f"Funcionário de {nome_mes}:")
+                df = pd.DataFrame(result, columns=["Nome", "Total de vendas"])
+                st.dataframe(df.set_index('Nome'), width=400)
+            
+            if table == "Produto mais vendido por mês":
+                mes = st.number_input("Mês", min_value=1, max_value=12)
+                nome_mes = meses.get(mes)
+                result = produto_mais_vendido_mes(conn, cursor, mes)
+                st.write(f"Produto mais vendido em {nome_mes}:")
+                df = pd.DataFrame(result, columns=["Mês", "Arrecadamento (R$)"])
+                st.dataframe(df.set_index('Mês'), width=800)
+
+            if table == "Arrecadamento mensal":
+                mes = st.number_input("Mês", min_value=1, max_value=12)
+                nome_mes = meses.get(mes)
+                result = arrecadamento_mensal(conn, cursor, mes)
+                st.write(f"Arrecadamento de {nome_mes}: R${result[0][0]}")
+
+            if table == "Produto favorito por cliente":
+                nome_cliente = st.text_input("Nome do cliente")
+                result = produto_mais_comprado_pelo_cliente(conn, cursor, nome_cliente)
+                st.write("Produto mais comprado pelo cliente:")
+                df = pd.DataFrame(result, columns=["Código do produto", "Nome do produto", "Total de compras"])
+                st.dataframe(df.set_index('Código do produto'), width=800)

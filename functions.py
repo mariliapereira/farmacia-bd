@@ -69,6 +69,35 @@ def select_table(conn, cursor, table, filter_column=None, input=None):
     result = cursor.fetchall()
     return result
     
+def funcionario_do_mes(conn, cursor, input):
+    query = f"select f.nome, COUNT(*) as vendas from funcionario f, venda v where f.cpf_func = v.fk_func and month(v.data_venda) = {input} group by f.cpf_func \
+             order by COUNT(*) desc limit 1;"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+
+def produto_mais_vendido_mes(conn, cursor, input):
+    query = f"SELECT p.nome as nome_produto, COUNT(*) as total_vendas FROM produto p JOIN produto_venda pv ON p.cod_prod = pv.fk_prod \
+                JOIN venda v ON pv.fk_venda = v.cod_nota_fiscal WHERE MONTH(v.data_venda) = {input} GROUP BY p.cod_prod \
+                ORDER BY total_vendas DESC LIMIT 1;"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+
+def produto_mais_comprado_pelo_cliente(conn, cursor, input):
+    query = f"SELECT pv.fk_prod AS codigo_produto, p.nome AS nome_produto, COUNT(*) AS total_compras FROM produto_venda pv \
+                JOIN venda v ON pv.fk_venda = v.cod_nota_fiscal JOIN produto p ON pv.fk_prod = p.cod_prod JOIN cliente c ON v.fk_cliente = c.cpf_cliente \
+                WHERE c.nome = '{input}' GROUP BY pv.fk_prod, p.nome ORDER BY total_compras DESC LIMIT 1;"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+
+def arrecadamento_mensal(conn, cursor, input):
+    query = f"SELECT SUM(valor) AS total_vendas FROM venda WHERE MONTH(data_venda) = {input};"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+
 def get_cod_nota(conn, cursor, cliente_venda, funcionario_venda, data_venda):
     query = f"SELECT cod_nota_fiscal FROM venda WHERE fk_cliente = '{cliente_venda}' AND fk_func = '{funcionario_venda}' AND data_venda = '{data_venda}';"
     cursor.execute(query)
