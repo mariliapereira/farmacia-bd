@@ -25,13 +25,8 @@ if __name__ == '__main__':
         login_button = st.button("Login", on_click=connect)
     else:
         st.title("Farmácia Novo Dia - Banco de Dados")
-        operation = st.sidebar.selectbox("Selecione a operação", ("Inserir", "Deletar", "Atualizar", "Buscar"))
-        # rever urgentemente isso aqui:
-        if operation == "Buscar":
-            table_options = ("Cliente", "Venda", "Produto", "Funcionário", "Vendas por data", "Valor por venda", "Balconista por turno", "Funcionário da venda", "Produtos por marca") 
-        else:
-            table_options = ("Cliente", "Venda", "Produto", "Funcionário")
-        table = st.sidebar.selectbox("Selecione a tabela", table_options)
+        operation = st.sidebar.selectbox("Selecione a operação", ("Inserir", "Deletar", "Atualizar", "Visualizar", "Gerar relatório"))
+        table = st.sidebar.selectbox("Escolha uma tabela:", ["Cliente", "Venda", "Produto", "Funcionário"])
             
         conn, cursor = open_conn(st.session_state['username'], st.session_state['password'])
 
@@ -83,6 +78,7 @@ if __name__ == '__main__':
                             st.button("Adicionar mais produtos", on_click=add_more)
                     
                     if st.button("Finalizar"):
+                        insert_data(conn, cursor, "produto_venda", (cod_prod_venda, fk_venda, 1 if receita_venda == "Sim" else 0, quantidade_venda))
                         st.write(f"Venda finalizada com sucesso! Código da nota fiscal gerada: {fk_venda}")
 
             if table == "Produto":
@@ -102,7 +98,6 @@ if __name__ == '__main__':
                     insert_data(conn, cursor, table, (preco, nome_produto, tipo_produto, descricao, marca))
             
             if table == "Funcionário":
-                # não lembro o que ficou definido de como a gente vai inserir essa galera, deixei assim pra depois a gente ver
                 func_type = st.sidebar.selectbox("Tipo de funcionário", ("Balconista", "Farmacêutico"))
                 if func_type == "Balconista":
                     cpf_balc = st.text_input("CPF - apenas números -")
@@ -118,17 +113,18 @@ if __name__ == '__main__':
                     numero_balc = st.number_input("Número", min_value=0)
                     bairro_balc = st.text_input("Bairro")
 
-                    cpf_func = cpf_balc if cpf_balc != "" else None
-                    nome_func = nome_balc if nome_balc != "" else None
+                    cpf_balc = cpf_balc if cpf_balc != "" else None
+                    nome_balc = nome_balc if nome_balc != "" else None
                     turno = turno if turno != "" else None
                     cpf_gerente = cpf_gerente if cpf_gerente != "" else None
-                    salario_func = salario_balc if salario_balc != "" else None
-                    data_nasc_func = data_nasc_balc if data_nasc_balc != "" else None
-                    rua_func = rua_balc if rua_balc != "" else None
-                    numero_func = numero_balc if numero_balc != "" else None
-                    bairro_func = bairro_balc if bairro_balc != "" else None
-                    telefone_func_1 = telefone_balc_1 if telefone_balc_1 != "" else None
-                    telefone_func_2 = telefone_balc_2 if telefone_balc_2 != "" else None
+                    salario_balc = salario_balc if salario_balc != "" else None
+                    data_nasc_balc = data_nasc_balc if data_nasc_balc != "" else None
+                    rua_balc = rua_balc if rua_balc != "" else None
+                    numero_bacl = numero_balc if numero_balc != "" else None
+                    bairro_balc = bairro_balc if bairro_balc != "" else None
+                    telefone_balc_1 = telefone_balc_1 if telefone_balc_1 != "" else None
+                    telefone_balc_2 = telefone_balc_2 if telefone_balc_2 != "" else None
+                    print(f'cpf gerente: {cpf_gerente}\ntelefone 1: {telefone_balc_1}\ntelefone2: {telefone_balc_2}')
 
                     if st.button("Inserir"):
                         insert_data(conn, cursor, "Funcionario", (cpf_balc, cpf_gerente, salario_balc, data_nasc_balc, telefone_balc_1, telefone_balc_2, rua_balc, numero_balc, bairro_balc, nome_balc))
@@ -148,17 +144,17 @@ if __name__ == '__main__':
                     numero_farm = st.number_input("Número", min_value=0)
                     bairro_farm = st.text_input("Bairro")
 
-                    cpf_func = cpf_farm if cpf_farm != "" else None
-                    nome_func = nome_farm if nome_farm != "" else None
+                    cpf_farm = cpf_farm if cpf_farm != "" else None
+                    nome_farm = nome_farm if nome_farm != "" else None
                     crf = crf if crf != "" else None
                     cpf_gerente = cpf_gerente if cpf_gerente != "" else None
-                    salario_func = salario_farm if salario_farm != "" else None
-                    data_nasc_func = data_nasc_farm if data_nasc_farm != "" else None
-                    rua_func = rua_farm if rua_farm != "" else None
-                    numero_func = numero_farm if numero_farm != "" else None
-                    bairro_func = bairro_farm if bairro_farm != "" else None
-                    telefone_func_1 = telefone_farm_1 if telefone_farm_1 != "" else None
-                    telefone_func_2 = telefone_farm_2 if telefone_farm_2 != "" else None
+                    salario_farm = salario_farm if salario_farm != "" else None
+                    data_nasc_farm = data_nasc_farm if data_nasc_farm != "" else None
+                    rua_farm = rua_farm if rua_farm != "" else None
+                    numero_farm = numero_farm if numero_farm != "" else None
+                    bairro_farm = bairro_farm if bairro_farm != "" else None
+                    telefone_farm_1 = telefone_farm_1 if telefone_farm_1 != "" else None
+                    telefone_farm_2 = telefone_farm_2 if telefone_farm_2 != "" else None
 
                     if st.button("Inserir"):
                         insert_data(conn, cursor, "Funcionario", (cpf_farm, cpf_gerente, salario_farm, data_nasc_farm, telefone_farm_1, telefone_farm_2, rua_farm, numero_farm, bairro_farm, nome_farm))
@@ -229,7 +225,7 @@ if __name__ == '__main__':
 
             if table == "Produto":
                 cod_produto = st.number_input("Código do produto", min_value=0)
-                novo_preco = st.number_input("Novo preço")
+                novo_preco = st.number_input("Novo preço", min_value=0.0)
                 novo_nome = st.text_input("Novo nome")
                 novo_tipo = st.radio("Novo tipo", ["RX", "OTC", "Diversos"])
                 nova_descricao = st.text_input("Nova descrição")
@@ -250,7 +246,7 @@ if __name__ == '__main__':
             if table == "Funcionário":
                 cpf_func = st.text_input("CPF do funcionário - apenas números -")
                 novo_cpf_gerente = st.text_input("CPF do novo gerente - apenas números -")
-                novo_salario = st.number_input("Novo salário")
+                novo_salario = st.number_input("Novo salário", min_value=0.0)
                 novo_nome = st.text_input("Novo nome")
                 nova_data = st.text_input("Nova data de nascimento")
                 novo_telefone_1 = st.text_input("Novo telefone")
@@ -290,62 +286,115 @@ if __name__ == '__main__':
                     if novo_turno:
                         update_data(conn, cursor, "Balconista", "turno", novo_turno, "cpf_balconista", cpf_func)
 
-        elif operation == 'Buscar':
+        elif operation == 'Visualizar':
             if table == "Cliente":
-                result = select_table(conn, cursor, table)
+                filter_option = st.radio("Filtrar clientes por:", ["Cpf", "Nome", "Telefone 1", "Telefone 2"], index = None)
+
+                if filter_option == None:
+                    result = select_table(conn, cursor, table)
+                else:
+                    user_input = st.text_input(f"Informe o {filter_option} para filtrar:")
+                    if filter_option == "Nome":
+                        result = select_table(conn, cursor, table, filter_column="Nome", input=user_input)
+                    elif filter_option == "Telefone 1":
+                        result = select_table(conn, cursor, table, filter_column="Telefone1", input=user_input)
+                    elif filter_option == "Telefone 2":
+                        result = select_table(conn, cursor, table, filter_column="Telefone2", input=user_input)
+                    elif filter_option == "Cpf":
+                        result = select_table(conn, cursor, table, filter_column="cpf_cliente", input=user_input)
+
                 st.write(f"{table}s:")
                 df = pd.DataFrame(result, columns=["Cpf", "Nome", "Telefone 1", "Telefone 2"])
                 st.dataframe(df.set_index('Cpf'), width=800)
+                
 
             if table == "Venda":
-                result = select_table(conn, cursor, table)
+                filter_option = st.radio("Filtrar vendas por:", ["Código da nota fiscal", "CPF do cliente", "CPF do funcionário", "Valor da venda", "Data", "Código do produto vendido"], index = None)
+
+                if filter_option == None:
+                    result = select_table(conn, cursor, table)
+                else:
+                    user_input = st.text_input(f"Informe o {filter_option} para filtrar:")
+                    if filter_option == "Código da nota fiscal":
+                        result = select_table(conn, cursor, table, filter_column="cod_nota_fiscal", input=user_input)
+                    elif filter_option == "CPF do cliente":
+                        result = select_table(conn, cursor, table, filter_column="fk_cliente", input=user_input)
+                    elif filter_option == "CPF do funcionário":
+                        result = select_table(conn, cursor, table, filter_column="fk_func", input=user_input)
+                    elif filter_option == "Valor da venda":
+                        result = select_table(conn, cursor, table, filter_column="valor", input=user_input)
+                    elif filter_option == "Data":
+                        result = select_table(conn, cursor, table, filter_column="data_venda", input=user_input)
+                    elif filter_option == "Código do produto vendido":
+                        result = select_table(conn, cursor, table, filter_column="fk_prod", input=user_input)
+                        
                 st.write(f"{table}s:")
                 df = pd.DataFrame(result, columns=["CPF do cliente", "CPF do funcionário", "Data da venda", "Valor da venda", "Código da nota fiscal"])
                 st.dataframe(df.set_index('Código da nota fiscal'), width=800)
+
             
             if table == "Produto":
-                result = select_table(conn, cursor, table)
+                filter_option = st.radio("Filtrar produtos por:", ["Nome", "Tipo", "Marca", "Descrição", "Preço", "Código do produto"], index = None)
+
+                if filter_option == None:
+                    result = select_table(conn, cursor, table)
+                else:
+                    user_input = st.text_input(f"Informe o {filter_option} para filtrar:")
+                    if filter_option == "Nome":
+                        result = select_table(conn, cursor, table, filter_column="Nome", input=user_input)
+                    elif filter_option == "Tipo":
+                        result = select_table(conn, cursor, table, filter_column="Tipo", input=user_input)
+                    elif filter_option == "Marca":
+                        result = select_table(conn, cursor, table, filter_column="Marca", input=user_input)
+                    elif filter_option == "Descrição":
+                        result = select_table(conn, cursor, table, filter_column="Descricao", input=user_input)
+                    elif filter_option == "Preço":
+                        result = select_table(conn, cursor, table, filter_column="Preco", input=user_input)
+                    elif filter_option == "Código do produto":
+                        result = select_table(conn, cursor, table, filter_column="cod_prod", input=user_input)
+
                 st.write(f"{table}s:")
                 df = pd.DataFrame(result, columns=["Código do produto", "Preço", "Nome", "Tipo", "Descrição", "Marca"])
                 st.dataframe(df.set_index('Código do produto'), width=800)
+
             
             if table == "Funcionário":
-                result = select_table(conn, cursor, "Funcionario")
+                filter_option = st.radio("Filtrar funcionários por:", ["Cpf", "Cpf do gerente", "Nome", "Telefone 1", "Telefone 2", "Salário", "Data de nascimento", "Rua", "Número", "Bairro", "Turno", "Crf"], index = None)
+
+                if filter_option == None:
+                    result = select_table(conn, cursor, "Funcionario")
+                else:
+                    user_input = st.text_input(f"Informe o {filter_option} para filtrar:")
+                    if filter_option == "Nome":
+                        result = select_table(conn, cursor, "Funcionario", filter_column="Nome", input=user_input)
+                    elif filter_option == "Cpf do gerente":
+                        result = select_table(conn, cursor, "Funcionario", filter_column="cpf_gerente", input=user_input)
+                    elif filter_option == "Cpf":
+                        result = select_table(conn, cursor, "Funcionario", filter_column="cpf_func", input=user_input)
+                    elif filter_option == "Telefone 1":
+                        result = select_table(conn, cursor, "Funcionario", filter_column="Telefone1", input=user_input)
+                    elif filter_option == "Telefone 2":
+                        result = select_table(conn, cursor, "Funcionario", filter_column="Telefone2", input=user_input)
+                    elif filter_option == "Cpf":
+                        result = select_table(conn, cursor, "Funcionario", filter_column="cpf_func", input=user_input)
+                    elif filter_option == "Salário":
+                        result = select_table(conn, cursor, "Funcionario", filter_column="salario", input=user_input)
+                    elif filter_option == "Data de nascimento":
+                        result = select_table(conn, cursor, "Funcionario", filter_column="data_nasc", input=user_input)
+                    elif filter_option == "Rua":
+                        result = select_table(conn, cursor, "Funcionario", filter_column="rua", input=user_input)
+                    elif filter_option == "Número":
+                        result = select_table(conn, cursor, "Funcionario", filter_column="numero", input=user_input)
+                    elif filter_option == "Bairro":
+                        result = select_table(conn, cursor, "Funcionario", filter_column="bairro", input=user_input)
+                    elif filter_option == "Tipo":
+                        result = select_table(conn, cursor, "Funcionario", filter_column="tipo", input=user_input)
+                    elif filter_option == "Turno":
+                        result = select_table(conn, cursor, "Funcionario", filter_column="turno", input=user_input)
+                    elif filter_option == "Crf":
+                        result = select_table(conn, cursor, "Funcionario", filter_column="crf", input=user_input)
+
                 st.write(f"{table}s:")
-                df = pd.DataFrame(result, columns=["CPF", "CPF do gerente", "Salário", "Data de nascimento", "Telefone 1", "Telefone 2", "Rua", "Número", "Bairro", "Nome"])
-                st.dataframe(df.set_index('CPF'), width=800)
-        
-            if table == "Balconista por turno":
-                turno = st.text_input("Turno de interesse")
-                if st.button("Buscar"):
-                    result = select_balc_turno(conn, cursor, turno)
-                    st.write(f"Balconistas que trabalham no turno da {turno}:")
-                    df = pd.DataFrame(result, columns=["Cpf", "Nome"])
-
-            if table == "Vendas por data":
-                data = st.text_input("Data de interesse")
-                if st.button("Buscar"):
-                    result = select_venda_data(conn, cursor, data)
-                    st.write(f"Vendas realizadas no dia {data}:")
-                    df = pd.DataFrame(result, columns=["CPF do cliente", "CPF do funcionário", "Data da venda", "Valor da venda", "Código da nota fiscal"])
-
-            if table == "Valor por venda":
-                cod_venda = st.number_input("Código da venda")
-                if st.button("Buscar"):
-                    result = select_preco_venda(conn, cursor, cod_venda)
-                    st.write("Valor da venda: R$")
-
-            if table == "Funcionário da venda":
-                cod_venda = st.number_input("Código da venda")
-                if st.button("Buscar"):
-                    result = select_func_venda(conn, cursor, cod_venda)
-                    st.write("Funcionário responsável pela venda: ")
-                    df = pd.DataFrame(result, columns=["Cpf", "Nome"])
-
-            if table == "Produtos por marca":
-                marca = st.text_input("Marca de interesse")
-                if st.button("Buscar"):
-                    result = select_prod_marca(conn, cursor, marca)
-                    st.write(f"Produtos da marca {marca}:")
-                    df = pd.DataFrame(result, columns=["Código do produto", "Preço", "Nome", "Tipo", "Descrição", "Marca"])
-
+                df = pd.DataFrame(result, columns=["Cpf", "Cpf do gerente", "Salário", "Data de nascimento", "Telefone 1", "Telefone 2", "Rua", "Número", "Bairro", "Nome"])
+                st.dataframe(df.set_index('Cpf'), width=800)
+               
