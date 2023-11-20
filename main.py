@@ -326,7 +326,7 @@ if __name__ == '__main__':
                     elif filter_option == "Data":
                         result = select_table(conn, cursor, table, filter_column="data_venda", input=user_input)
                     elif filter_option == "Código do produto vendido":
-                        result = select_table(conn, cursor, table, filter_column="fk_prod", input=user_input)
+                        result = select_table(conn, cursor, table, filter_column="cod_prod", input=user_input)
                         
                 st.write(f"{table}s:")
                 df = pd.DataFrame(result, columns=["CPF do cliente", "CPF do funcionário", "Data da venda", "Valor da venda", "Código da nota fiscal"])

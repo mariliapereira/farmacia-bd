@@ -50,22 +50,16 @@ def update_data(conn, cursor, table, set_column, set_value, condition_column, co
     conn.commit()
     st.success(f"Dados atualizados em {table}.")
 
-#def select_table(conn, cursor, table):
-#    query = f"SELECT * FROM {table}"
-#    cursor.execute(query)
-#    data = cursor.fetchall()
-#    return data
-
 def select_table(conn, cursor, table, filter_column=None, input=None):
     if filter_column and input:
         if table == "Venda" and filter_column in ["valor", "cod_nota_fiscal"]:
             query = f"SELECT * FROM {table} WHERE {filter_column} = {input};"
-        elif table == "Venda" and filter_column == "fk_prod":
+        elif table == "Venda" and filter_column == "cod_prod":
             query = f"SELECT v.* FROM venda v JOIN produto_venda pv ON v.cod_nota_fiscal = pv.fk_venda WHERE pv.fk_prod = {input};"
         elif table == "Funcionario" and filter_column == "turno":
-            query = f"SELECT f.*, b.turno FROM funcionario f JOIN balconista b ON f.cpf_func = b.cpf_balconista WHERE b.turno = '{input}';"
-        elif table == "FUncionario" and filter_column == "crf":
-            query = f"SELECT f.*, p.crf FROM funcionario f JOIN farmaceutico p ON f.cpf_func = p.cpf_farm WHERE p.crf = '{input}';"
+            query = f"SELECT f.* FROM funcionario f JOIN balconista b ON f.cpf_func = b.cpf_balconista WHERE b.turno = '{input}';"
+        elif table == "Funcionario" and filter_column == "crf":
+            query = f"SELECT f.* FROM funcionario f JOIN farmaceutico fm ON f.cpf_func = fm.cpf_farm WHERE fm.crf = '{input}';"
         else: 
             query = f"SELECT * FROM {table} WHERE {filter_column} LIKE '%{input}%';"
     else:
