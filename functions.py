@@ -77,17 +77,17 @@ def funcionario_do_mes(conn, cursor, input):
     return result
 
 def produto_mais_vendido_mes(conn, cursor, input):
-    query = f"SELECT p.nome as nome_produto, COUNT(*) as total_vendas FROM produto p JOIN produto_venda pv ON p.cod_prod = pv.fk_prod \
-                JOIN venda v ON pv.fk_venda = v.cod_nota_fiscal WHERE MONTH(v.data_venda) = {input} GROUP BY p.cod_prod \
-                ORDER BY total_vendas DESC LIMIT 1;"
+    query = f"SELECT p.nome as nome_produto, SUM(pv.quantidade) as total_quantidade_vendida FROM produto p JOIN produto_venda pv ON p.cod_prod = pv.fk_prod \
+                JOIN venda v ON pv.fk_venda = v.cod_nota_fiscal WHERE MONTH(v.data_venda) = {input} GROUP BY p.cod_prod, p.nome \
+                ORDER BY total_quantidade_vendida DESC LIMIT 1;"
     cursor.execute(query)
     result = cursor.fetchall()
     return result
 
 def produto_mais_comprado_pelo_cliente(conn, cursor, input):
-    query = f"SELECT pv.fk_prod AS codigo_produto, p.nome AS nome_produto, COUNT(*) AS total_compras FROM produto_venda pv \
+    query = f"SELECT pv.fk_prod AS codigo_produto, p.nome AS nome_produto, SUM(pv.quantidade) AS total_quantidade_comprada FROM produto_venda pv \
                 JOIN venda v ON pv.fk_venda = v.cod_nota_fiscal JOIN produto p ON pv.fk_prod = p.cod_prod JOIN cliente c ON v.fk_cliente = c.cpf_cliente \
-                WHERE c.nome = '{input}' GROUP BY pv.fk_prod, p.nome ORDER BY total_compras DESC LIMIT 1;"
+                WHERE c.nome = '{input}' GROUP BY pv.fk_prod, p.nome ORDER BY total_quantidade_comprada DESC LIMIT 1;"
     cursor.execute(query)
     result = cursor.fetchall()
     return result
