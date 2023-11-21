@@ -4,24 +4,8 @@ import mysql.connector
 # pip install mysql-connector-python
 
 def open_conn(input_user, input_password):
-    conn2 = mysql.connector.connect(
-        host="localhost", user="root", password="pacienc1@", database="farmacia"
-    )
-    cursor2 = conn2.cursor()
-    cursor2.execute(f"SELECT COUNT(*) FROM mysql.user WHERE user = '{input_user}'")
-    user_exists = cursor2.fetchone()[0]
-    if not user_exists:
-        cursor2.execute(
-            f"CREATE USER '{input_user}'@'localhost' IDENTIFIED BY '{input_password}';"
-        )
-        cursor2.execute(f"GRANT ALL PRIVILEGES ON * . * TO '{input_user}'@'localhost';")
-        cursor2.execute(f"FLUSH PRIVILEGES;")
-
     conn = mysql.connector.connect(
-        host="localhost",
-        user=input_user,
-        password=input_password,
-        database="farmacia",
+        host="localhost", user=input_user, password=input_password, database="farmacia"
     )
 
     cursor = conn.cursor()

@@ -2,9 +2,6 @@ import streamlit as st
 import pandas as pd
 from functions import *
 
-# rodar com:  
-# streamlit run "c:/Users/heyda/OneDrive/Documentos/GitHub/farmacia-bd/main.py"
-
 if __name__ == '__main__':
     if 'username' not in st.session_state:
         st.session_state.username = None
@@ -405,6 +402,7 @@ if __name__ == '__main__':
         elif operation == "Gerar relatório":
             meses = {1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril", 5: "Maio", 6: "Junho", 
                                 7: "Julho", 8: "Agosto", 9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro"}
+            
             if table == "Funcionário do mês":
                 mes = st.number_input("Mês", min_value=1, max_value=12)
                 result = funcionario_do_mes(conn, cursor, mes)
