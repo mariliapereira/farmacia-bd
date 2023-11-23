@@ -417,7 +417,7 @@ if __name__ == '__main__':
                 result = produto_mais_vendido_mes(conn, cursor, mes)
                 st.write(f"Produto mais vendido em {nome_mes}:")
                 df = pd.DataFrame(result, columns=["Mês", "Arrecadamento (R$)"])
-                st.dataframe(df.set_index('Mês'), width=800)
+                st.dataframe(df.set_index('Mês'), width=500)
 
             if table == "Arrecadamento mensal":
                 mes = st.number_input("Mês", min_value=1, max_value=12)
@@ -430,4 +430,4 @@ if __name__ == '__main__':
                 result = produto_mais_comprado_pelo_cliente(conn, cursor, nome_cliente)
                 st.write("Produto mais comprado pelo cliente:")
                 df = pd.DataFrame(result, columns=["Código do produto", "Nome do produto", "Total de compras"])
-                st.dataframe(df.set_index('Código do produto'), width=800)
+                st.dataframe(df.set_index('Código do produto'), width=500)
